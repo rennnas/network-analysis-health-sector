@@ -11,7 +11,7 @@ From centrality measures, I calculated the institutions and political actors wit
 
 The intent was to also visualize the network:
 
-!![alt text] (https://github.com/rennnas/network-analysis-health-sector/blob/main/imagem%201.png)
+![alt text](https://github.com/rennnas/network-analysis-health-sector/blob/main/imagem%201.png)
 
 
 ### Conclusions
