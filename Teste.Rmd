@@ -1,0 +1,241 @@
+---
+title: "Mapeamento Político do Setor de Saúde no Brasil"
+author: "Renan Magalhães"
+output:
+  tufte::tufte_handout: default
+  html_document:
+    df_print: paged
+  tufte::tufte_html: default
+---
+```{r}
+library(tufte)
+```
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+O seguinte trabalho procura contribuir com as ações do IEPS em construir uma agenda para o setor saúde e para o futuro do SUS no pós-pandemia, a Agenda 2022. Para isso, procuramos construir um mapeamento político dos atores do setor saúde no Brasil, vislumbrando estratégias de engajamento.
+
+### Metodologia
+
+  O trabalho partiu de uma busca inicial da compreensão dos diferentes Macrotemas propostos para a Agenda 2022 e o perfil dos atores ali envolvidos. Os Macrotemas são:
+  
+  * 1.1. Modelos de Gestão
+  * 1.2. Integração Público Privada
+  * 1.3 Financiamento do SUS
+  * 2.1. Recursos humanos no sistema de saúde
+  * 2.2. Infraestrutura em saúde
+  * 2.3. Tecnologia e Inovação em Saúde
+  * 3.1 Regionalização
+  * 3.2 Competências interfederativas
+  * 3.3. Pacto Federativo e constituição das redes de atenção à saúde
+  * 4.1. Atenção Primária
+  * 5.1. Condições de vida e saúde
+  * 5.2. Equidade e inclusão de grupos sociais em saúde
+  * 5.3 Saúde mental
+  * 5.4. Saúde e meio ambiente
+  
+  Considerando o limite temporal desse trabalho, mapeamentos anteriores realizados pelo IEPS e nas ações futuras da organização, decidimos por concentrar nossos esforços em um primeiro momento nos Macrotemas 4 e 5 e seus subtemas:
+  
+  * 4.1.1 Promoção da Saúde
+  * 4.1.2 Fortalecimento das vigilâncias em saúde
+  * 4.1.3 Expansão da estratégia Saúde da Família
+  * 5.2.1 Saúde da população negra
+  * 5.2.2 Saúde dos povos indígenas e quilombolas
+  * 5.2.3 Saúde da população LGBT
+  * 5.2.4 Saúde da Pessoa com Deficiência
+  * 5.2.1 Políticas públicas de saúde mental
+  * 5.2.2. Desafios para o futuro das políticas de saúde mental
+  * 5.3.1. Pandemias e degradação do meio ambiente
+  * 5.3.2. Desafios da saúde socioambiental
+  
+  A partir dessa delimitação dos temas observados e sua melhor compreensão, buscou-se compreender os atores e intituições relacionados com esses macro e microtemas em um processo de identificação, análise política (análise de stakeholders) e análise dos vínculos institucionais (network analsyis).
+  
+### Identificação 
+
+  A Tabela de identificação dos atores é a primeira etapa desse mapeamento, funcionando como um banco de dados dos atores a serem analisados posteriormente. Para cada entrada no banco de dados foi criado um ID para as análises futuras, facilitando os processos de joint e merging tables. A tabela ainda paresenta o nome do órgão, a sigla, a esfera administrativa, o nome da chefia responsável, contatos, a abrangência espacial e a natureza do ator (administraçõa pública, setor privado, terceiro setor, etc.).
+
+
+![Visualização do Tabela de Identificação](C:/Users/magal/Documents/Código/imagem-1.jpg)
+
+### Análise de Stakeholders
+
+  A segunda tabela da base de dados consiste em uma breve análise de stakeholders dos atores mapeados. A análise procura responder as seguintes perguntas:
+  
+  
+  * Que recursos este ator possui?	
+  * O que ele/a vislumbra de importante ao relacionar-se com o IEPS/Agenda 2022?	
+  * Qual a importância para o IEPS no relacionamento com ele/a?
+  
+  A análise procura apresentar características básicas de cada ator mapeado de forma a facilitar o processo de identificação destes. Com isso, a análise pode servir como um guia para as atividades de formação de comissão dos trabalhos da Agenda 2022 ou de outras ações do IEPS, apresentando uma ideia inicial de quem é o ator com quem a instituição está lidando, suas ações e projetos, seus interesses em relacionar-se com o IEPS e sua importância  no avanço das discussões da Agenda 2022 e na composição dos grupos de trabalho.
+  
+  
+![Visualização do Tabela de Análise de Stakeholders](C:/Users/magal/Documents/Código/imagem-2.jpg)  
+
+### Network Analysis
+
+  Finalmente, o banco de dados contribui para um network analysis entre os atores políticos do Setor de Saúde no Brasil, observando de que maneira os atores políticos se relacionam e estão conectados entre si. Para isso, construímos o banco de dados observando as principais instituições parceiras, os membros do conselho e os principais apoios financeiros de cada ator político.
+  O banco da dos inicial que contava com iniciais 85 atores políticos identificados expandiu para 718 com 729 ligações entre si. Utilizando-se das teorias de network analysis, apresentamos pesos diferentes para cada relacionamento:
+  * Peso 1 para o relacionamento entre instituições parceiras;
+  * Peso 2 para o relacionamento com membros de conselho;
+  * Peso 3 para o relacionamento com instituições que financiam o trabalho de outro ator político.
+
+  A seguir apresentamos uma visão geral do mapeamento:
+  
+```{r}
+library(igraph)
+library(readr)
+library(tidyr)
+library(readxl)
+library(ggraph)
+library(ggplot2)
+library(dplyr)
+library(Rcpp)
+library(visNetwork)
+library(extrafont)
+```
+  
+```{r}
+nodes <- read_excel("IDS.xlsx")
+nodes
+
+ties <- read_excel("Relacionamentos.xlsx")
+ties
+
+g <- graph_from_data_frame(ties, directed = FALSE, vertices = nodes)
+g
+```
+
+```{r fig.width=10, fig.height=10, echo=FALSE}
+
+got_palette <- c("#1A5878", "#C44237", "#AD8941", "#E99093", 
+                 "#50594B", "#8968CD", "#9ACD32")
+
+ggraph(g, layout = "stress", bbox = 10) + 
+  geom_edge_link(aes(alpha = weight)) + 
+  geom_node_point(aes(fill = type), shape = 21) +
+  scale_fill_brewer(palette = "Set1") +
+  scale_edge_width(range = c(0.2,3))+
+  scale_size(range = c(100,800))+
+  theme_graph()+
+  theme(legend.position = "none") +
+  theme_graph()
+
+```
+
+A partir da construção dessa rede de atores, com o código fonte, é possível realizar alterações e filtros, exibindo por tipo de ator mapeado ou pelo tipo de conexão entre eles. Da mesma forma, a network analysis nos permite realizar inferências sobre os atores que a visualização por si só não permite.
+
+### Medidas de Centralidade
+
+   A partir de medidas de centralidade, podemos calcular as instituições e atores políticos com maior número de conexões. Aqui utilizamos a mais simples e popular medida de centralidade na ciência de network - grau de centralidade. No contexto desse dataset, isso significa o número de atores políticos que cada ator político está conectado.
+
+
+```{r}
+nodes_with_centrality <- nodes %>%
+  mutate(degree = degree(g)) %>%
+  arrange(desc(degree))
+
+nodes_with_centrality
+
+```
+
+  A partir dessa base inicial, é possível filtrar conforme o tipo de organização/ator político.
+
+
+```{r}
+ngo <- nodes_with_centrality %>%
+  filter(type == "Organizações não-governamentais")
+
+ngo
+
+```
+```{r}
+pessoas <- nodes_with_centrality %>%
+  filter(type == "Pesquisadores, Membros de Conselho e Chefias")
+
+pessoas
+```
+
+  Como nem todos os relacionamentos são iguais, podemos levar em consideração além do número de conexões, os atores políticos com conexões mais fortes:
+  
+```{r}
+
+nodes_with_centrality_strength <- nodes %>%
+  mutate(
+    degree = degree(g),
+    strength = strength(g)
+  ) %>%
+  arrange(desc(strength))
+
+nodes_with_centrality_strength
+
+
+
+```
+
+```{r}
+governos <- nodes_with_centrality_strength %>%
+  filter(type == "Governos")
+governos
+
+```
+
+```{r}
+ngos2 <- nodes_with_centrality_strength %>%
+  filter(type == "Organizações não-governamentais")
+ngos2
+```
+
+### Inbetweenness
+
+  Finalmente, podemos calcular a "inbetweenness" da nossa rede.Inbetweenness, ou intermediação, pode ser definido quantidade de influência que um nó tem sobre o fluxo de informações em um gráfico. Pontos com alto indíce de betweenness pode ter considerável influência sobre uma rede por controlar o tráfego de informações entre os nós. Assim, remover um desses pontos pode romper toda a comunicação entre os pontos.
+
+
+```{r}
+
+dist_weight <- 1 / E(g)$weight
+
+ties_with_betweenness <- ties %>%
+  mutate(betweenness = edge_betweenness(g, weights = dist_weight))
+
+ties_with_betweenness
+
+```
+
+```{r}
+ties_joined <- ties_with_betweenness %>% 
+  left_join(nodes_with_centrality_strength , by = c("from" = "id")) %>% 
+  left_join(nodes_with_centrality_strength , by = c("to" = "id"))
+
+ties_joined
+```
+
+
+
+```{r}
+
+ties_selected <- ties_joined %>% 
+  select(from, to, name_from = name.x, name_to = name.y, betweenness)
+ties_selected
+```
+
+  Finalmente, apresentamos os pontos com maior influência na rede:
+  
+```{r}
+ties_selected %>%
+  # Arrange rows by descending betweenness
+  arrange(desc(betweenness))
+```
+
+
+### Conclusões
+
+  Esse trabalho pretende ser um guia para as futuras ações do IEPS, um documento a ser consultado conforme os interesses e projetos da organização, focado principalmente nas Agenda 2022.
+  
+  A base de dados e o código em R permitem alterações, expansões e filtros conforme as perguntas de interesse a serem respondidas. Por isso, esse documento não pretende nesse momento apresentar uma análise do resultado do mapeamento e da network analysis aqui feita, isso por que acreditamos que ela deva responder os questionamentos conforme o interesse do IEPS em cada etapa de trabalho da Agenda 2022.
+  
+  Assim, além das informações contidas na etapa inicial de análise de stakeholders, o código construído aqui tem potecial para responder perguntas como: 
+qual o pesquisador ou membro de conselho mais influente na rede? Qual organização do terceiro setor possui maior capilaridade? Qual a distância entre o IEPS e uma organização x de interesse?
+
+   Dessa forma, o mapeamento a seguir apresentado deve ser visto não como um projeto acabado, mas sim como um guia para as ações futuras do IEPS, um instrumentos que pode ser consultado ao longo da construção da Agenda 2022. Assim, o projeto pode ser expandido conforme novos atores vão sendo descobertos - ou conforme as diferentes ações do IEPS vão expandindo sua lista de contatos.
