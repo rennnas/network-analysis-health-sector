@@ -11,9 +11,9 @@ From centrality measures, I calculated the institutions and political actors wit
 
 The intent was to also visualize the network:
 
-![])
+!![alt text] (https://github.com/rennnas/network-analysis-health-sector/blob/main/imagem%201.png)
 
 
-###Conclusions
+### Conclusions
 
 This work intends to be a guide for the future actions of the IEPS, a document to be consulted according to the interests and projects of the organization, focused mainly on Agenda 2022. The database and the code in R allow changes, expansions and filters according to the questions of interest to be answered. Therefore, this document does not intend at this time to present an analysis of the result of the mapping and network analysis carried out here because we believe that it should answer the questions according to the interest of the IEPS in each work stage of the 2022 Agenda.
